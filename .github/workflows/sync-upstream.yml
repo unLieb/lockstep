@@ -1,0 +1,56 @@
+name: Sync upstream & rebuild
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: github.repository != 'caglaryalcin/lockstep'
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/caglaryalcin/lockstep.git
+          git fetch upstream main
+
+      - name: Merge upstream/main
+        id: merge
+        run: |
+          if git merge upstream/main --no-edit; then
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "::error::Merge conflict syncing with upstream/main - resolve manually."
+            git merge --abort
+            exit 1
+          fi
+
+      - name: Push merged main
+        if: steps.merge.outputs.changed == 'true'
+        run: git push origin main
+
+      - name: Trigger image rebuild
+        if: steps.merge.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run "Build Docker image" --ref main --repo ${{ github.repository }}
