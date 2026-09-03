@@ -5,6 +5,7 @@ import type { PriorityKey } from "~/types/PSC";
 type LanguageMetadata = {
   label: string;
   nativeLabel: string;
+  flag: string;
 };
 
 const en = {
@@ -29,6 +30,7 @@ const en = {
   "auth.passwordLabel": "Password",
   "auth.passwordPlaceholder": "At least 6 characters",
   "auth.passwordError": "Password must be at least 6 characters.",
+  "auth.rememberDevice": "Remember this device for 30 days",
   "auth.login": "Sign in",
   "auth.register": "Create account",
   "auth.loginError": "Username or password is incorrect.",
@@ -69,6 +71,13 @@ const en = {
   "settings.deleteAll": "Delete All",
   "settings.close": "Close",
   "settings.confirmDelete": "Are you sure you want to delete all saved data? This will erase your progress.",
+  "footer.links": "Lockstep links",
+  "footer.versionAria": "Lockstep version {{version}}",
+  "footer.updateAvailable": "v{{version}} available!",
+  "footer.updateAria": "Lockstep version {{version}} is available. Open release notes in a new tab.",
+  "footer.github": "Open Lockstep on GitHub in a new tab",
+  "footer.issue": "Open a new Lockstep issue on GitHub in a new tab",
+  "footer.license": "License",
   "progress.title": "Your Progress",
   "progress.completed": "You've completed {{completed}} out of {{total}} items",
   "progress.noStatsTitle": "No stats yet",
@@ -147,6 +156,7 @@ const tr = {
   "auth.passwordLabel": "Şifre",
   "auth.passwordPlaceholder": "En az 6 karakter",
   "auth.passwordError": "Şifre en az 6 karakter olmalı.",
+  "auth.rememberDevice": "Bu cihazı 30 gün hatırla",
   "auth.login": "Giriş yap",
   "auth.register": "Hesap oluştur",
   "auth.loginError": "Kullanıcı adı veya şifre hatalı.",
@@ -187,6 +197,13 @@ const tr = {
   "settings.deleteAll": "Hepsini Sil",
   "settings.close": "Kapat",
   "settings.confirmDelete": "Kayıtlı tüm verileri silmek istediğine emin misin? İlerlemen silinecek.",
+  "footer.links": "Lockstep bağlantıları",
+  "footer.versionAria": "Lockstep sürümü {{version}}",
+  "footer.updateAvailable": "v{{version}} available!",
+  "footer.updateAria": "Lockstep {{version}} sürümü hazır. Sürüm notlarını yeni sekmede aç.",
+  "footer.github": "Lockstep'i GitHub'da yeni sekmede aç",
+  "footer.issue": "GitHub'da yeni Lockstep issue'su aç",
+  "footer.license": "Lisans",
   "progress.title": "İlerlemen",
   "progress.completed": "{{completed}} / {{total}} madde tamamlandı",
   "progress.noStatsTitle": "Henüz istatistik yok",
@@ -265,6 +282,7 @@ const de = {
   "auth.passwordLabel": "Passwort",
   "auth.passwordPlaceholder": "Mindestens 6 Zeichen",
   "auth.passwordError": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+  "auth.rememberDevice": "Dieses Gerät 30 Tage merken",
   "auth.login": "Anmelden",
   "auth.register": "Konto erstellen",
   "auth.loginError": "Benutzername oder Passwort ist falsch.",
@@ -305,6 +323,13 @@ const de = {
   "settings.deleteAll": "Alles löschen",
   "settings.close": "Schließen",
   "settings.confirmDelete": "Möchtest du wirklich alle gespeicherten Daten löschen? Dadurch wird dein Fortschritt gelöscht.",
+  "footer.links": "Lockstep-Links",
+  "footer.versionAria": "Lockstep-Version {{version}}",
+  "footer.updateAvailable": "v{{version}} available!",
+  "footer.updateAria": "Lockstep-Version {{version}} ist verfügbar. Versionshinweise in einem neuen Tab öffnen.",
+  "footer.github": "Lockstep auf GitHub in einem neuen Tab öffnen",
+  "footer.issue": "Ein neues Lockstep-Issue auf GitHub in einem neuen Tab öffnen",
+  "footer.license": "Lizenz",
   "progress.title": "Dein Fortschritt",
   "progress.completed": "Du hast {{completed}} von {{total}} Punkten abgeschlossen",
   "progress.noStatsTitle": "Noch keine Statistiken",
@@ -367,16 +392,19 @@ const languageRegistry = {
   en: {
     label: "English",
     nativeLabel: "English",
+    flag: "🇬🇧",
     dictionary: en,
   },
   de: {
     label: "German",
     nativeLabel: "Deutsch",
+    flag: "🇩🇪",
     dictionary: de,
   },
   tr: {
     label: "Turkish",
     nativeLabel: "Türkçe",
+    flag: "🇹🇷",
     dictionary: tr,
   },
 } as const satisfies Record<string, LanguageMetadata & { dictionary: Record<TranslationKey, string> }>;
@@ -389,6 +417,7 @@ export const languages = Object.entries(languageRegistry).map(([code, definition
   code: code as Language,
   label: definition.label,
   nativeLabel: definition.nativeLabel,
+  flag: definition.flag,
 }));
 
 export const LanguageContext = createContextId<Signal<Language>>("lockstep.language");
