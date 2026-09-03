@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   actions: write
-  workflows: write
 
 jobs:
   sync:
@@ -34,16 +33,29 @@ jobs:
       - name: Merge upstream/main
         id: merge
         run: |
-          if git merge upstream/main --no-edit; then
-            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-              echo "changed=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "changed=false" >> "$GITHUB_OUTPUT"
-            fi
-          else
+          PRE_MERGE="$(git rev-parse HEAD)"
+
+          if ! git merge upstream/main --no-edit; then
             echo "::error::Merge conflict syncing with upstream/main - resolve manually."
             git merge --abort
             exit 1
+          fi
+
+          # GITHUB_TOKEN can never create/update files under .github/workflows/
+          # (GitHub hard-blocks that push regardless of the permissions above),
+          # so keep this fork's own workflow files as-is: drop whatever the
+          # merge brought in under that path and restore our pre-merge copies.
+          if ! git diff --quiet "$PRE_MERGE" -- .github/workflows; then
+            git rm -r --ignore-unmatch --quiet .github/workflows
+            git checkout "$PRE_MERGE" -- .github/workflows
+            git add .github/workflows
+            git commit --amend --no-edit
+          fi
+
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Push merged main
